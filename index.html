@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Georg Stopfer — What I Built With AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2F1EC;
+    --ink:#18223B;
+    --ink-soft:#5A6275;
+    --card:#FFFFFF;
+    --line:#E3E1D8;
+    --mark:#F0A500;
+    --mark-wash:rgba(240,165,0,.32);
+    --display:'Space Grotesk',sans-serif;
+    --body:'Newsreader',Georgia,serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:18px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+
+  /* shared bits */
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+  .mark{
+    background:linear-gradient(180deg,transparent 58%,var(--mark-wash) 58%);
+    padding:0 .08em;
+  }
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.in{opacity:1;transform:none;}
+  .lnk{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--mark);white-space:nowrap;font-weight:500;}
+  .lnk:hover{background:var(--mark-wash);}
+
+  /* header bar */
+  .topbar{
+    border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:20;
+    background:rgba(242,241,236,.86);
+    backdrop-filter:blur(8px);
+  }
+  .topbar .wrap{display:flex;justify-content:space-between;align-items:center;height:58px;}
+  .topbar .who{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.02em;}
+  .topbar .who span{color:var(--mark);}
+  .topbar .meta{font-family:var(--mono);font-size:12px;color:var(--ink-soft);}
+
+  /* hero */
+  .hero{padding:88px 0 64px;}
+  .hero .kicker{margin-bottom:30px;}
+  .hero h1{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:clamp(34px,5.4vw,62px);
+    line-height:1.04;
+    letter-spacing:-.02em;
+    max-width:18ch;
+  }
+  .hero .lede{
+    font-size:clamp(19px,2.2vw,23px);
+    color:var(--ink-soft);
+    max-width:46ch;
+    margin-top:26px;
+  }
+  .heroline{
+    margin-top:48px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .heroline .cell{background:var(--paper);padding:22px 20px;}
+  .heroline .n{font-family:var(--display);font-weight:700;font-size:clamp(26px,3.4vw,38px);letter-spacing:-.02em;}
+  .heroline .l{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:8px;}
+
+  /* thesis strip */
+  .thesis{
+    background:var(--ink);
+    color:var(--paper);
+    padding:56px 0;
+    margin-top:4px;
+  }
+  .thesis .eyebrow{color:#9aa3b8;}
+  .thesis p{
+    font-family:var(--display);
+    font-weight:500;
+    font-size:clamp(22px,3vw,32px);
+    line-height:1.3;
+    letter-spacing:-.01em;
+    max-width:24ch;
+    margin-top:18px;
+  }
+  .thesis .mark{background:linear-gradient(180deg,transparent 58%,rgba(240,165,0,.5) 58%);}
+  .thesis .sub{
+    font-family:var(--body);
+    font-size:18px;
+    color:#c3c9d6;
+    max-width:54ch;
+    margin-top:24px;
+    font-weight:400;
+  }
+
+  /* section heading */
+  .sec-head{padding:72px 0 12px;}
+  .sec-head h2{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(22px,2.6vw,28px);
+    letter-spacing:-.01em;
+    margin-top:10px;
+  }
+
+  /* builds */
+  .builds{display:flex;flex-direction:column;}
+  .build{
+    display:grid;
+    grid-template-columns:64px 1fr;
+    gap:28px;
+    padding:40px 0;
+    border-top:1px solid var(--line);
+  }
+  .build .idx{
+    font-family:var(--mono);
+    font-size:14px;
+    font-weight:700;
+    color:var(--mark);
+    padding-top:6px;
+  }
+  .build h3{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(21px,2.4vw,26px);
+    letter-spacing:-.01em;
+  }
+  .build h3 .tag{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:3px 10px;
+    margin-left:10px;
+    vertical-align:middle;
+    transform:translateY(-2px);
+  }
+  .build .what{margin-top:14px;color:var(--ink);max-width:62ch;}
+  .build .pitch{
+    margin-top:18px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:3px solid var(--mark);
+    border-radius:0 8px 8px 0;
+    padding:18px 22px;
+    max-width:64ch;
+  }
+  .build .pitch .ptitle{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:8px;
+  }
+  .build .pitch p{font-size:17px;line-height:1.55;}
+
+  /* featured build #1 */
+  .build.feat{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:38px 36px;
+    margin-bottom:8px;
+    grid-template-columns:64px 1fr;
+  }
+  .build.feat .phases{
+    display:flex;flex-wrap:wrap;gap:7px;margin-top:18px;
+  }
+  .build.feat .phases span{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;
+    background:var(--paper);border:1px solid var(--line);border-radius:6px;
+    padding:5px 9px;color:var(--ink-soft);
+  }
+  .build.feat .phases span b{color:var(--ink);font-weight:700;}
+
+  /* supporting */
+  .support{
+    border-top:1px solid var(--line);
+    padding:44px 0 0;
+  }
+  .support .grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;
+    margin-top:22px;
+  }
+  .support .item{background:var(--paper);padding:20px 22px;}
+  .support .item .nm{font-family:var(--mono);font-weight:700;font-size:14px;}
+  .support .item .ds{font-size:15.5px;color:var(--ink-soft);margin-top:5px;line-height:1.45;}
+
+  /* ledger / bottom line */
+  .ledger{
+    background:var(--ink);
+    color:var(--paper);
+    margin-top:80px;
+    padding:72px 0 80px;
+  }
+  .ledger .eyebrow{color:#9aa3b8;}
+  .ledger h2{
+    font-family:var(--display);font-weight:600;
+    font-size:clamp(24px,3vw,34px);letter-spacing:-.01em;margin-top:12px;
+  }
+  .ledger .stats{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:30px 24px;margin-top:46px;
+  }
+  .ledger .stat .v{
+    font-family:var(--display);font-weight:700;
+    font-size:clamp(30px,4vw,46px);letter-spacing:-.02em;line-height:1;
+  }
+  .ledger .stat .v em{font-style:normal;background:linear-gradient(180deg,transparent 60%,rgba(240,165,0,.55) 60%);padding:0 2px;}
+  .ledger .stat .k{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
+    color:#aab2c4;margin-top:12px;line-height:1.4;
+  }
+  .ledger .closing{
+    margin-top:56px;padding-top:34px;border-top:1px solid rgba(255,255,255,.14);
+    font-family:var(--body);font-size:clamp(19px,2.3vw,24px);line-height:1.5;
+    max-width:60ch;color:#e7e9ee;
+  }
+  .ledger .closing b{color:#fff;font-weight:600;}
+
+  /* footer */
+  footer{padding:40px 0 64px;}
+  footer .wrap{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;}
+  footer .nm{font-family:var(--display);font-weight:600;font-size:18px;}
+  footer a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--mark);font-family:var(--mono);font-size:14px;}
+  footer a:hover{background:var(--mark-wash);}
+  footer .small{font-family:var(--mono);font-size:12px;color:var(--ink-soft);}
+
+  a:focus-visible,span:focus-visible{outline:2px solid var(--mark);outline-offset:3px;}
+
+  @media (max-width:720px){
+    body{font-size:17px;}
+    .wrap{padding:0 20px;}
+    .hero{padding:56px 0 44px;}
+    .heroline{grid-template-columns:repeat(2,1fr);}
+    .build,.build.feat{grid-template-columns:1fr;gap:14px;padding:32px 0;}
+    .build.feat{padding:30px 24px;}
+    .build .idx{padding-top:0;}
+    .support .grid{grid-template-columns:1fr;}
+    .ledger .stats{grid-template-columns:repeat(2,1fr);}
+    .topbar .meta{display:none;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="who">MaxContent<span>SEO</span></div>
+    <div class="meta">BUILD LOG · 21 APR – 28 JUN 2026</div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker eyebrow reveal">Georg Stopfer · Solo operator · ~10 weeks</div>
+    <h1 class="reveal">From zero coding to a <span class="mark">production acquisition engine</span> in two months.</h1>
+    <p class="lede reveal">A single person, working only with AI, built what would normally take a small team several months — with compliance, quality control, and a sellable side-product. No prior software-engineering background.</p>
+
+    <div class="heroline reveal">
+      <div class="cell"><div class="n">349</div><div class="l">Git commits</div></div>
+      <div class="cell"><div class="n">~2,000</div><div class="l">Project files</div></div>
+      <div class="cell"><div class="n">~313</div><div class="l">Businesses contacted</div></div>
+      <div class="cell"><div class="n">121</div><div class="l">Full SEO audits</div></div>
+    </div>
+  </div>
+</header>
+
+<section class="thesis">
+  <div class="wrap">
+    <div class="eyebrow reveal">The headline</div>
+    <p class="reveal">~400–500 hours of skilled work, <span class="mark">compressed into a system</span> that runs unattended.</p>
+    <p class="sub reveal">One complete lead — finding it, auditing it, cross-checking five data sources, writing the email, passing 18 quality checks — is roughly 3–4 hours of skilled human work by hand. The pipeline does it in minutes. Across ~313 contacted businesses and 121 full audits, that's the equivalent of about three months of full-time manual labour — built and run by one person.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="sec-head">
+    <div class="eyebrow reveal">The builds</div>
+    <h2 class="reveal">Six things shipped, in order of weight</h2>
+  </div>
+
+  <div class="builds">
+
+    <!-- 1 featured -->
+    <article class="build feat reveal">
+      <div class="idx">01</div>
+      <div>
+        <h3>MaxContentSEO Pipeline <span class="tag">the core engine</span></h3>
+        <p class="what">An end-to-end acquisition machine for local beauty, wellness and TCM businesses. It finds qualified leads, builds a defensible SEO audit, writes a legally compliant (UWG/DSGVO) outreach email, and drops it ready-to-send. The only manual step is the final "send" click.</p>
+        <div class="phases">
+          <span><b>1</b> Lead selection</span>
+          <span><b>2</b> 5-source data gathering</span>
+          <span><b>3</b> Second-model cross-check</span>
+          <span><b>4</b> Draft creation</span>
+          <span><b>5</b> 18-point quality gate</span>
+          <span><b>6</b> Roast pass</span>
+          <span><b>7</b> Email verification</span>
+          <span><b>8</b> Draft filing</span>
+        </div>
+        <div class="pitch">
+          <span class="ptitle">Proof it's real, not a toy</span>
+          <p>349 commits, 228 documented pipeline runs, and 27 documented auto-aborts — the quality filter actively stops bad emails from going out rather than shipping junk.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- 2 -->
+    <article class="build reveal">
+      <div class="idx">02</div>
+      <div>
+        <h3>gego <span class="tag">AI-visibility tracker · Go</span></h3>
+        <p class="what">A self-built command-line tool in Go that tracks how a brand appears in AI answers (ChatGPT, Perplexity, Gemini) — the "are we cited by the AI?" question classic SEO tools can't answer. Compiles to real binaries (gego.exe, lingqi-tracker.exe), runs weekly, ships with proper repo structure.</p>
+        <div class="pitch">
+          <span class="ptitle">The rarest asset here</span>
+          <p>LLM-visibility tracking barely exists as a product in the German-speaking market. Built once, it now runs on its own — the only strand of the business that scales without costing more of my time.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- 3 -->
+    <article class="build reveal">
+      <div class="idx">03</div>
+      <div>
+        <h3>blitztext <span class="tag">voice-to-text · Python</span></h3>
+        <p class="what">One of the very first tools built (20 Apr 2026). A global-hotkey speech-to-text tool — Ctrl+Shift, speak, text appears anywhere — plus a video transcription module for Skool/Vimeo/Loom <span style="color:var(--ink-soft)">(inspired by <a class="lnk" href="https://www.youtube.com/@christophmagnussen" target="_blank" rel="noopener">Christoph Magnussen&nbsp;↗</a>, built on my own)</span>.</p>
+        <div class="pitch">
+          <span class="ptitle">The clearest time-saving example</span>
+          <p>Dictation runs ~3× faster than typing. Across ten weeks where nearly everything was written, that turns 2–3 hours of daily typing into under an hour of speaking — a cumulative saving of dozens of hours. It paid for its own build time within days.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- 4 -->
+    <article class="build reveal">
+      <div class="idx">04</div>
+      <div>
+        <h3>GEO Product <span class="tag">lead magnet + collateral</span></h3>
+        <p class="what">A complete GEO (Generative Engine Optimization) guide, versions 1 through 5, plus a landing-page brief ("AI-Visibility-Check") and supporting articles. The funnel's front door — paid entry product and lead magnet feeding the consulting business.</p>
+        <div class="pitch">
+          <span class="ptitle">Packaged, not one-off</span>
+          <p>Five iterated versions represent multiple days of freelance copywriting — but more importantly, they turn internal GEO know-how into a repeatable asset rather than advice given once.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- 5 -->
+    <article class="build reveal">
+      <div class="idx">05</div>
+      <div>
+        <h3>geo-audit Skills <span class="tag">citability scoring</span></h3>
+        <p class="what">A suite of Claude skills — geo-audit, geo-compare, geo-monitor, geo-fix-content, geo-fix-schema — that score a website's citability by AI across four dimensions.</p>
+        <div class="pitch">
+          <span class="ptitle">Fuzzy judgment → repeatable score</span>
+          <p>What would be half a day of manual analysis per site becomes a structured skill run — and the same skills power both the consulting service and the gego product.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- 6 -->
+    <article class="build reveal">
+      <div class="idx">06</div>
+      <div>
+        <h3>MaxContentSEO Website <span class="tag">live · Jekyll</span></h3>
+        <p class="what">A public Jekyll site on GitHub Pages — blog, industries, case studies, legal pages, audit examples. Live, and serving as the brand's front, with the content engine feeding it automatically. <a class="lnk" href="https://maxcontentseo.de/" target="_blank" rel="noopener">maxcontentseo.de&nbsp;↗</a></p>
+        <div class="pitch">
+          <span class="ptitle">An agency-scale deliverable, solo</span>
+          <p>A custom multi-section business site with a content pipeline behind it is typically a multi-week agency project costing several thousand euros. Built and maintained alone.</p>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- supporting -->
+  <section class="support">
+    <div class="eyebrow reveal">Also in the workshop</div>
+    <div class="grid reveal">
+      <div class="item"><div class="nm">Heidi</div><div class="ds">TikTok / social AI-influencer project with a Higgsfield content pipeline. Research & build phase. <a class="lnk" href="https://www.tiktok.com/@heidi.outfits" target="_blank" rel="noopener">@heidi.outfits&nbsp;↗</a></div></div>
+      <div class="item"><div class="nm">TikTokAutocutter</div><div class="ds">Automatic video-cutting prototype.</div></div>
+      <div class="item"><div class="nm">PainTracker</div><div class="ds">Tracking-tool prototype.</div></div>
+      <div class="item"><div class="nm">BookingDealHunter</div><div class="ds">Separate deal-finding project.</div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ledger -->
+<section class="ledger">
+  <div class="wrap">
+    <div class="eyebrow reveal">The bottom line</div>
+    <h2 class="reveal">Ten weeks, counted</h2>
+    <div class="stats">
+      <div class="stat reveal"><div class="v"><em>349</em></div><div class="k">Git commits</div></div>
+      <div class="stat reveal"><div class="v">~2,000</div><div class="k">Project files<br>718 Python · 1,155 Markdown</div></div>
+      <div class="stat reveal"><div class="v">~313</div><div class="k">Businesses contacted</div></div>
+      <div class="stat reveal"><div class="v"><em>121</em></div><div class="k">Full SEO audits</div></div>
+      <div class="stat reveal"><div class="v">207</div><div class="k">Outreach drafts written</div></div>
+      <div class="stat reveal"><div class="v">228</div><div class="k">Pipeline runs · 27 auto-aborts</div></div>
+      <div class="stat reveal"><div class="v"><em>2</em></div><div class="k">Compiled standalone tools<br>gego · blitztext</div></div>
+      <div class="stat reveal"><div class="v">3</div><div class="k">Live products<br>pipeline · website · GEO guide</div></div>
+    </div>
+    <p class="closing reveal">In one sentence: a solo operator, starting from no engineering background, used AI to build a <b>compliant, quality-controlled acquisition infrastructure</b> plus a <b>sellable AI-visibility product</b> in ten weeks — work that would normally require a small team and a budget many times the cost.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="nm">Georg Stopfer</div>
+      <div class="small">MaxContentSEO · Kirchheim bei München</div>
+    </div>
+    <a href="mailto:georg@maxcontentseo.de">georg@maxcontentseo.de</a>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.12, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{
+    el.style.transitionDelay = Math.min(i*40,240)+'ms';
+    io.observe(el);
+  });
+</script>
+
+</body>
+</html>
